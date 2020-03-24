@@ -56,9 +56,9 @@ export class ImportCompletion implements vscode.CompletionItemProvider {
         return {
             label: imp.name,
             kind: vscode.CompletionItemKind.Reference,
-            detail: `[AI] import ${imp.name} (Auto-Import)`,
-            documentation: `[AI]  Import ${imp.name} from ${path}`,
-            command: { title: 'AI: Autocomplete', command: 'extension.resolveImport', arguments: [{ imp, document }] }
+            detail: `[SAI] import ${imp.name} (Auto-Import)`,
+            documentation: `[SAI]  Import ${imp.name} from ${path}`,
+            command: { title: 'SAI: Autocomplete', command: 'extension.resolveImport', arguments: [{ imp, document }] }
         }
     }
 

@@ -3,7 +3,6 @@
 'use strict';
 
 const path = require('path');
-const ClosurePlugin = require('closure-webpack-plugin');
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -12,7 +11,7 @@ const config = {
   entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
   output: {
     // the bundle is stored in the 'dist' folder (check package.json), 📖 -> https://webpack.js.org/configuration/output/
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'out'),
     filename: 'extension.js',
     libraryTarget: 'commonjs2',
     devtoolModuleFilenameTemplate: '../[resource-path]'
@@ -36,19 +35,6 @@ const config = {
           }
         ]
       }
-    ]
-  },
-  optimization: {
-    minimizer: [
-      new ClosurePlugin({}, {
-        // compiler flags here
-        //
-        // for debugging help, try these:
-        //
-        // formatting: 'PRETTY_PRINT'
-        // debug: true,
-        // renaming: false
-      })
     ]
   }
 };

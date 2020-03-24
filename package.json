@@ -3,7 +3,7 @@
     "displayName": "Svelte Auto Import",
     "description": "Automatically finds, parses and provides code actions and code completion for all available imports. Works with Typescript, Javascript and svelte files",
     "repository": "https://github.com/pivaszbs/svelte-autoimport",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "publisher": "pivaszbs",
     "engines": {
         "vscode": "^1.17.0"
@@ -28,7 +28,7 @@
         "onLanguage:typescript",
         "onLanguage:svelte"
     ],
-    "main": "./out/src/extension",
+    "main": "./out/extension.js",
     "contributes": {
         "commands": [
             {
@@ -88,8 +88,6 @@
     },
     "devDependencies": {
         "@types/node": "^6.0.40",
-        "closure-webpack-plugin": "^2.3.0",
-        "google-closure-compiler": "^20200315.0.0",
         "ts-loader": "^6.2.2",
         "typescript": "^2.0.3",
         "vscode": "^1.0.0",
