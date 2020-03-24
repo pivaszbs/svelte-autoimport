@@ -3,7 +3,7 @@
     "displayName": "Svelte Auto Import",
     "description": "Automatically finds, parses and provides code actions and code completion for all available imports. Works with Typescript, Javascript and svelte files",
     "repository": "https://github.com/pivaszbs/svelte-autoimport",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "publisher": "pivaszbs",
     "engines": {
         "vscode": "^1.17.0"
