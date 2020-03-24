@@ -8,13 +8,15 @@ export class ImportFixer {
     private spacesBetweenBraces;
     private doubleQuotes;
     private useSemiColon;
+    private importWithIntend;
 
     constructor() {
-        let config = vscode.workspace.getConfiguration('autoimport');
+        let config = vscode.workspace.getConfiguration('svelte-autoimport');
 
         this.useSemiColon = config.get<boolean>('useSemiColon');
         this.spacesBetweenBraces = config.get<boolean>('spaceBetweenBraces');
         this.doubleQuotes = config.get<boolean>('doubleQuotes');
+        this.importWithIntend = config.get<boolean>('importWithIntend');
     }
 
     public fix(document: vscode.TextDocument, range: vscode.Range,
@@ -29,6 +31,14 @@ export class ImportFixer {
 
         let edit: vscode.WorkspaceEdit = new vscode.WorkspaceEdit();
         let importObj: vscode.Uri | any = imports[0].file;
+        let importPosition: vscode.Position;
+        const match = /<script/.exec(document.getText());
+        if (match && match.index > -1) {
+            const scriptTagPosition = document.positionAt(match.index)
+            importPosition = new vscode.Position(scriptTagPosition.line + 1, 0)
+        } else {
+            importPosition = new vscode.Position(0, 0);
+        }
         let importName: string = imports[0].name;
 
         let relativePath = this.normaliseRelativePath(importObj, this.getRelativePath(document, importObj));
@@ -41,8 +51,8 @@ export class ImportFixer {
             edit.replace(document.uri, new vscode.Range(0, 0, document.lineCount, 0),
                 this.mergeImports(document, edit, importName, importObj, relativePath));
         } else {
-            edit.insert(document.uri, new vscode.Position(0, 0),
-                this.createImportStatement(imports[0].name, relativePath, true));
+            edit.insert(document.uri, importPosition,
+                this.createImportStatement(imports[0], relativePath, true));
         }
 
         return edit;
@@ -98,7 +108,7 @@ export class ImportFixer {
 
             importArray.push(name)
 
-            let newImport = this.createImportStatement(importArray.join(', '), relativePath);
+            let newImport = this.createImportStatement(importArray.join(', '), relativePath, false, true);
 
             currentDoc = currentDoc.replace(exp, newImport);
         }
@@ -106,26 +116,40 @@ export class ImportFixer {
         return currentDoc;
     }
 
-    private createImportStatement(imp: string, path: string, endline: boolean = false): string {
+    private createImportStatement(imp, path: string, endline: boolean = false, merge: boolean = false): string {
 
         let formattedPath = path.replace(/\"/g, '')
             .replace(/\'/g, '');
-
+        
+        const importName = imp.name || imp;
         let returnStr = '';
-
-        if ((this.doubleQuotes) && (this.spacesBetweenBraces)) {
-            returnStr = `import { ${imp} } from "${formattedPath}";${endline ? '\r\n' : ''}`;
+        if (imp.def) {
+            if (this.doubleQuotes) {
+                returnStr = `import ${importName} from "${formattedPath}";${endline ? '\r\n' : ''}`;
+            } else {
+                returnStr = `import ${importName} from '${formattedPath}';${endline ? '\r\n' : ''}`;
+            }
+        } else if ((this.doubleQuotes) && (this.spacesBetweenBraces)) {
+            returnStr = `import { ${importName} } from "${formattedPath}";${endline ? '\r\n' : ''}`;
         } else if (this.doubleQuotes) {
-            returnStr = `import {${imp}} from "${formattedPath}";${endline ? '\r\n' : ''}`;
+            returnStr = `import {${importName}} from "${formattedPath}";${endline ? '\r\n' : ''}`;
         } else if (this.spacesBetweenBraces) {
-            returnStr = `import { ${imp} } from '${formattedPath}';${endline ? '\r\n' : ''}`;
+            returnStr = `import { ${importName} } from '${formattedPath}';${endline ? '\r\n' : ''}`;
         } else {
-            returnStr = `import {${imp}} from '${formattedPath}';${endline ? '\r\n' : ''}`;
+            returnStr = `import {${importName}} from '${formattedPath}';${endline ? '\r\n' : ''}`;
         }
 
 
         if (this.useSemiColon === false) {
             returnStr = returnStr.replace(';', '');
+        }
+
+        if (imp.def) {
+            returnStr = returnStr.replace(/([{}]+)/g, '')
+        }
+
+        if (this.importWithIntend && !merge && path.split('.').pop() === 'svelte') {
+            returnStr = '\t' + returnStr;
         }
 
         return returnStr;
@@ -162,7 +186,7 @@ export class ImportFixer {
 
         if (importObj.discovered === undefined) {
             relativePath = makeRelativePath(relativePath);
-            relativePath = removeFileExtenion(relativePath);
+            // relativePath = removeFileExtenion(relativePath);
         }
 
         return relativePath;

@@ -45,7 +45,7 @@ export class NodeUpload {
 
             vscode.workspace.workspaceFolders.forEach(workspace => {
 
-                let glob = vscode.workspace.getConfiguration('autoimport').get<string>('filesToScan');
+                let glob = vscode.workspace.getConfiguration('svelte-autoimport').get<string>('filesToScan');
 
                 const relativePattern = new vscode.RelativePattern(workspace, glob);
 

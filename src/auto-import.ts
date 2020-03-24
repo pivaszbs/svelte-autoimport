@@ -26,11 +26,11 @@ export class AutoImport {
 
     public attachCommands(): void {
 
-        let codeActionFixer = vscode.languages.registerCodeActionsProvider('typescript', new ImportAction())
+        let codeActionFixer = vscode.languages.registerCodeActionsProvider('svelte', new ImportAction())
 
         let importScanner = vscode.commands.registerCommand('extension.importScan', (request: any) => {
 
-            let scanner = new ImportScanner(vscode.workspace.getConfiguration('autoimport'))
+            let scanner = new ImportScanner(vscode.workspace.getConfiguration('svelte-autoimport'))
 
             if (request.showOutput) {
                 scanner.scan(request);
@@ -43,14 +43,14 @@ export class AutoImport {
         });
 
         let nodeScanner = vscode.commands.registerCommand('extension.scanNodeModules', () => {
-            new NodeUpload(vscode.workspace.getConfiguration('autoimport')).scanNodeModules();
+            new NodeUpload(vscode.workspace.getConfiguration('svelte-autoimport')).scanNodeModules();
         });
 
         let importFixer = vscode.commands.registerCommand('extension.fixImport', (d, r, c, t, i) => {
             new ImportFixer().fix(d, r, c, t, i);
         });
 
-        let completetion = vscode.languages.registerCompletionItemProvider('typescript', new ImportCompletion(this.context, vscode.workspace.getConfiguration('autoimport').get<boolean>('autoComplete')), '');
+        let completetion = vscode.languages.registerCompletionItemProvider('svelte', new ImportCompletion(this.context, vscode.workspace.getConfiguration('svelte-autoimport').get<boolean>('autoComplete')), '');
 
         AutoImport.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 1);
 
@@ -69,7 +69,7 @@ export class AutoImport {
             
             vscode.workspace.workspaceFolders.forEach(workspace => {
 
-                let glob = vscode.workspace.getConfiguration('autoimport').get<string>('filesToScan');
+                let glob = vscode.workspace.getConfiguration('svelte-autoimport').get<string>('filesToScan');
 
                 const relativePattern = new vscode.RelativePattern(workspace, glob);
 
@@ -95,7 +95,7 @@ export class AutoImport {
 
         } else {
 
-            let glob = vscode.workspace.getConfiguration('autoimport').get<string>('filesToScan');
+            let glob = vscode.workspace.getConfiguration('svelte-autoimport').get<string>('filesToScan');
 
             let watcher = vscode.workspace.createFileSystemWatcher(glob);
 
@@ -126,7 +126,7 @@ export class AutoImport {
 
         let firstRun = (settings === undefined || settings.firstRun);
 
-        if (vscode.workspace.getConfiguration('autoimport').get<boolean>('showNotifications')) {
+        if (vscode.workspace.getConfiguration('svelte-autoimport').get<boolean>('showNotifications')) {
             vscode.window
                 .showInformationMessage('[AutoImport] Building cache');
         }

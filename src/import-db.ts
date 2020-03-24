@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 export interface ImportObject {
     name: string,
     file: vscode.Uri,
+    def: Boolean,
     workspace: vscode.WorkspaceFolder
 }
 
@@ -51,7 +52,7 @@ export class ImportDb {
 
     }
 
-    public static saveImport(name: string, data: any, file: any, workspace: vscode.WorkspaceFolder): void {
+    public static saveImport(name: string, data: any, file: any, workspace: vscode.WorkspaceFolder, def?: Boolean): void {
 
         name = name.trim();
 
@@ -63,6 +64,7 @@ export class ImportDb {
         let obj: ImportObject = {
             name,
             file,
+            def,
             workspace
         }
 

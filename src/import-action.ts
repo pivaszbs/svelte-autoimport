@@ -12,8 +12,6 @@ export interface Context {
 }
 
 export class ImportAction {
-
-
     public provideCodeActions(document: vscode.TextDocument, range: vscode.Range,
         context: vscode.CodeActionContext, token: vscode.CancellationToken): vscode.Command[] {
 

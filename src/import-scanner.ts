@@ -49,7 +49,7 @@ export class ImportScanner {
     public edit(request: any): void {
         ImportDb.delete(request);
         this.loadFile(request.file, request.workspace, true);
-        new NodeUpload(vscode.workspace.getConfiguration('autoimport')).scanNodeModules();
+        new NodeUpload(vscode.workspace.getConfiguration('svelte-autoimport')).scanNodeModules();
 
     }
 
@@ -104,7 +104,7 @@ export class ImportScanner {
         });
     }
 
-    private processFile(data: any, file: vscode.Uri, workspace: vscode.WorkspaceFolder): void {
+    private async processFile(data: any, file: vscode.Uri, workspace: vscode.WorkspaceFolder): Promise<any> {
 
         var classMatches = data.match(/(export class) ([a-zA-z])\w+/g),
             interfaceMatches = data.match(/(export interface) ([a-zA-z])\w+/g),
@@ -112,8 +112,23 @@ export class ImportScanner {
             varMatches = data.match(/(export var) ([a-zA-z])\w+/g),
             constMatches = data.match(/(export const) ([a-zA-z])\w+/g),
             enumMatches = data.match(/(export enum) ([a-zA-z])\w+/g),
-            typeMatches = data.match(/(export type) ([a-zA-z])\w+/g)
+            typeMatches = data.match(/(export type) ([a-zA-z])\w+/g),
+            defaultMatches = data.match(/(export default) ([a-zA-z])\w+/g),
+            svelteMatches = file.path.split('.').pop() === 'svelte'
 
+        if (svelteMatches) {
+            let workingFile: string = file.path.split('/').pop().split('.').shift(); 
+            ImportDb.saveImport(this.toPascalCase(workingFile), data, file, workspace, true);
+            return;
+        }
+
+        if (defaultMatches) {
+            defaultMatches.forEach(m => {
+                let workingFile: string = m.replace('default').replace('export');
+                ImportDb.saveImport(workingFile, data, file, workspace, true);
+            })
+        }
+        
         if (classMatches) {
             classMatches.forEach(m => {
                 let workingFile: string =
@@ -141,5 +156,10 @@ export class ImportScanner {
                 ImportDb.saveImport(workingFile, data, file, workspace);
             });
         }
+    }
+
+    private toPascalCase(string: string): string {
+        string = string.charAt(0).toUpperCase() + string.slice(1)
+        return string.replace(/[-_]([a-z])/g, (g: string) => g[1].toUpperCase())
     }
 }
