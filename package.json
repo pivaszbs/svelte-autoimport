@@ -3,7 +3,7 @@
     "displayName": "Svelte Auto Import",
     "description": "Automatically finds, parses and provides code actions and code completion for all available imports. Works with Typescript, Javascript and svelte files",
     "repository": "https://github.com/pivaszbs/svelte-autoimport",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "publisher": "pivaszbs",
     "engines": {
         "vscode": "^1.17.0"
@@ -74,6 +74,11 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Script tag is indented (check this if imports are indented by one indentation level too little)"
+                },
+                "svelte-autoimport.images": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Import images under script tag"
                 }
             }
         }

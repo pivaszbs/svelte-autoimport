@@ -18,8 +18,13 @@ export class ImportScanner {
 
     private showNotifications: boolean;
 
+    private imageExtensions: Array<string> = ['png', 'jpg', 'jpeg', 'svg'];
+
     constructor(private config: vscode.WorkspaceConfiguration) {
         this.filesToScan = this.config.get<string>('filesToScan');
+        if (this.config.get<boolean>('images')) {
+            this.filesToScan = [this.filesToScan.split('}')[0], this.imageExtensions.join(',')].join(',') + '}';
+        }
         this.showNotifications = this.config.get<boolean>('showNotifications');
     }
 
@@ -114,9 +119,10 @@ export class ImportScanner {
             enumMatches = data.match(/(export enum) ([a-zA-z])\w+/g),
             typeMatches = data.match(/(export type) ([a-zA-z])\w+/g),
             defaultMatches = data.match(/(export default) ([a-zA-z])\w+/g),
-            svelteMatches = file.path.split('.').pop() === 'svelte'
+            svelteMatches = file.path.split('.').pop() === 'svelte',
+            imageMatches = this.imageExtensions.indexOf(file.path.split('.').pop()) !== -1;
 
-        if (svelteMatches) {
+        if (svelteMatches || imageMatches) {
             let workingFile: string = file.path.split('/').pop().split('.').shift(); 
             ImportDb.saveImport(this.toPascalCase(workingFile), data, file, workspace, true);
             return;
