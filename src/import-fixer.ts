@@ -9,6 +9,7 @@ export class ImportFixer {
     private doubleQuotes;
     private useSemiColon;
     private importWithIntend;
+    private svelte: boolean = false;
 
     constructor() {
         let config = vscode.workspace.getConfiguration('svelte-autoimport');
@@ -34,8 +35,9 @@ export class ImportFixer {
         let importPosition: vscode.Position;
         const match = /<script/.exec(document.getText());
         if (match && match.index > -1) {
-            const scriptTagPosition = document.positionAt(match.index)
-            importPosition = new vscode.Position(scriptTagPosition.line + 1, 0)
+            const scriptTagPosition = document.positionAt(match.index);
+            importPosition = new vscode.Position(scriptTagPosition.line + 1, 0);
+            this.svelte = true;
         } else {
             importPosition = new vscode.Position(0, 0);
         }
@@ -148,7 +150,7 @@ export class ImportFixer {
             returnStr = returnStr.replace(/([{}]+)/g, '')
         }
 
-        if (this.importWithIntend && !merge && path.split('.').pop() === 'svelte') {
+        if (this.importWithIntend && !merge && this.svelte) {
             returnStr = '\t' + returnStr;
         }
 
